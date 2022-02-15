@@ -4,9 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/jackc/pgtype"
-	"github.com/jackc/pgx/v4"
-	"github.com/jmoiron/sqlx/types"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -14,6 +11,10 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v4"
+	"github.com/jmoiron/sqlx/types"
 )
 
 var dbConnect *pgx.Conn
@@ -153,6 +154,12 @@ func serve(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//wangEditor指定返回json格式
+type Res struct {
+	Errno int      `json:"errno"`
+	Data  []string `json:"data"`
+}
+
 func UploadImg(r *http.Request, w http.ResponseWriter) {
 	msg := replyProto{
 		Status: 0,
@@ -166,6 +173,14 @@ func UploadImg(r *http.Request, w http.ResponseWriter) {
 
 	fmt.Println(r.MultipartForm.File)
 
+	label := strconv.FormatInt(time.Now().Unix(), 10)
+	var name string
+	data := make([]string, 0, 0)
+	res := Res{
+		Errno: 0,
+		Data:  data,
+	}
+
 	for key, value := range r.MultipartForm.File {
 		fmt.Println(key, value)
 		file, m, err := r.FormFile(key)
@@ -177,10 +192,12 @@ func UploadImg(r *http.Request, w http.ResponseWriter) {
 		//if err != nil {
 		//	return
 		//}
-
-		saveFile, err := os.OpenFile("./images/"+strconv.FormatInt(time.Now().Unix(), 10)+m.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		name = m.Filename
+		saveFile, err := os.OpenFile("../../images/"+label+m.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		_, err = io.Copy(saveFile, file)
 		if err != nil {
+			msg.Msg = err.Error()
+			msg.Status = -1000
 			fmt.Println(err.Error())
 			return
 		}
@@ -188,28 +205,41 @@ func UploadImg(r *http.Request, w http.ResponseWriter) {
 		defer func(file multipart.File) {
 			err := file.Close()
 			if err != nil {
-
+				fmt.Println(err.Error())
+				return
 			}
 		}(file)
 		defer func(saveFile *os.File) {
 			err := saveFile.Close()
 			if err != nil {
-
+				fmt.Println(err.Error())
+				return
 			}
 		}(saveFile)
+
+		url := "http://8.142.102.189:8083/" + label + name
+		fmt.Println(url)
+
+		data = append(data, url)
+		res.Data = data
+
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	//Marshal()将数据编码成json字符串
+	buf, err := json.Marshal(&res)
 	if err != nil {
-		msg.Msg = err.Error()
+		_, err := w.Write([]byte(fmt.Sprintf(`{"code":-300,"msg":"%s"}`, err.Error())))
+		if err != nil {
+			return
+		}
 		fmt.Println(err.Error())
-		reply(w, &msg)
 		return
 	}
 
-	jsonMap := make(map[string]interface{})
-	//将json字符串转换成map
-	err = json.Unmarshal(body, &jsonMap)
+	_, err = w.Write(buf)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 }
 
