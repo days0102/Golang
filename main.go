@@ -173,12 +173,12 @@ func UploadImg(r *http.Request, w http.ResponseWriter) {
 			return
 		}
 		// 保存图片
-		//err = os.Mkdir("./uploaded/", 0777)
+		//err = os.Mkdir("./images/", 0777)
 		//if err != nil {
 		//	return
 		//}
 
-		saveFile, err := os.OpenFile("./uploaded/"+strconv.FormatInt(time.Now().Unix(), 10)+m.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		saveFile, err := os.OpenFile("./images/"+strconv.FormatInt(time.Now().Unix(), 10)+m.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		_, err = io.Copy(saveFile, file)
 		if err != nil {
 			fmt.Println(err.Error())
