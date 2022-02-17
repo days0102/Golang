@@ -18,6 +18,7 @@ import (
 )
 
 var dbConnect *pgx.Conn
+var imgUrl string="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
 
 //const path = "^/(?P<one>\\w+)/(?P<two>\\w+)"
 
@@ -219,12 +220,14 @@ func UploadImg(r *http.Request, w http.ResponseWriter) {
 
 		url := "http://8.142.102.189:8083/" + label + name
 		fmt.Println(url)
+		imgUrl=url
 
 		data = append(data, url)
 		res.Data = data
 
 	}
 
+	
 	//Marshal()将数据编码成json字符串
 	buf, err := json.Marshal(&res)
 	if err != nil {
@@ -263,10 +266,13 @@ func CreateArticle(r *http.Request, w http.ResponseWriter) {
 
 	//fmt.Println(jsonMap)
 
-	sql := "insert into article(create_by,title,description,content,figure,stars,likes,comments) values($1,$2,$3,$4,'https://img-blog.csdnimg.cn/2021062810504495.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl81MDc5MjM5Ng==,size_16,color_FFFFFF,t_70',0,0,0)"
+	sql := "insert into article(create_by,title,description,content,figure,stars,likes,comments) values($1,$2,$3,$4,$5,0,0,0)"
 
 	dbConnect, err = pgx.Connect(context.Background(), dbString)
-	exec, err := dbConnect.Exec(context.Background(), sql, "202215122", jsonMap["title"], jsonMap["description"], jsonMap["content"])
+	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["create_by"], jsonMap["title"], jsonMap["description"], jsonMap["content"],imgUrl)
+	fmt.Println("insert:"+imgUrl)
+	imgUrl="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+	
 	if err != nil {
 		msg.Status = -600
 		msg.Msg = err.Error()
@@ -281,7 +287,7 @@ func CreateArticle(r *http.Request, w http.ResponseWriter) {
 
 	if exec.Insert() {
 		reply(w, &msg)
-		fmt.Println("注册成功")
+		fmt.Println("发布成功")
 	}
 
 	err = dbConnect.Close(context.Background())
