@@ -61,6 +61,8 @@ type Article struct {
 	Content     string           `json:"content"`
 	Stars       int              `json:"stars"`
 	Likes       int              `json:"likes"`
+	Like  		bool 			 `json:"like"`
+	Star        bool             `json:"star"`
 	Comments    int              `json:"comments"`
 	CreateAt    pgtype.Timestamp `json:"create_at"`
 	UpdateAt    pgtype.Timestamp `json:"update_at"`
@@ -75,6 +77,8 @@ type Comment struct {
 	Content   string           `json:"content"`
 	Stars     int              `json:"stars"`
 	Likes     int              `json:"likes"`
+	Like      bool             `json:"like"`
+	Star      bool             `json:"star"`
 	Comments  int              `json:"comments"`
 	CreateAt  pgtype.Timestamp `json:"create_at"`
 	Oneself   int              `json:"oneself"`
@@ -479,6 +483,8 @@ func ReadComment(r *http.Request, w http.ResponseWriter) {
 			return
 		}
 		//fmt.Println(comment)
+		comment.Like = false
+		comment.Star = false
 		msg.Comments = append(msg.Comments, comment)
 	}
 
@@ -543,6 +549,8 @@ func ReadArticles(w http.ResponseWriter) {
 		}
 
 		//fmt.Println(article)
+		article.Like=false
+		article.Star=false
 		msg.Articles = append(msg.Articles, article)
 	}
 	reply(w, &msg)
