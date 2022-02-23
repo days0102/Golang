@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgtype"
 	"github.com/jackc/pgx/v4"
 	"github.com/jmoiron/sqlx/types"
@@ -82,6 +83,8 @@ type Comment struct {
 	Comments  int              `json:"comments"`
 	CreateAt  pgtype.Timestamp `json:"create_at"`
 	Oneself   int              `json:"oneself"`
+	StarsAry  pgtype.TextArray `json:"starsAry"`
+	LikesAry  pgtype.TextArray `json:"likesAry"`
 }
 
 type User struct {
@@ -101,6 +104,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println("method:" + strings.ToLower(r.Method))
 	//
 	//fmt.Println(r.URL.Path)
+	// fmt.Println(r.RemoteAddr)
 
 	switch r.URL.Path {
 	case "/api/login":
@@ -139,6 +143,14 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		UploadImg(r, w)
 		break
 
+	case "/api/comment/dislike":
+		CommentDislike(r, w)
+		break
+
+	case "/api/comment/like":
+		CommentLike(r, w)
+		break
+
 	default:
 		//ReadArticles(r, w)
 		break
@@ -158,6 +170,140 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	//}
 
 }
+
+func CommentLike(r *http.Request, w http.ResponseWriter) {
+	msg := replyProto{
+		Status: 0,
+		Msg:    "success",
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		msg.Msg = err.Error()
+		fmt.Println(err.Error())
+		reply(w, &msg)
+		return
+	}
+
+	jsonMap := make(map[string]interface{})
+	//将json字符串转换成map
+	err = json.Unmarshal(body, &jsonMap)
+	if err != nil {
+		msg.Msg = err.Error()
+		fmt.Println(err.Error())
+		reply(w, &msg)
+		return
+	}
+
+	// fmt.Println(jsonMap)
+
+	var exec pgconn.CommandTag
+	flag, _ := jsonMap["flag"]
+	if flag.(float64) == 1 {
+		sql := "update comment set likes=array_append((select likes from comment where id=$1),$2) where id=$3"
+		dbConnect, err = pgx.Connect(context.Background(), dbString)
+		exec, err = dbConnect.Exec(context.Background(), sql, jsonMap["id"], jsonMap["account"], jsonMap["id"])
+		if err != nil {
+			msg.Status = -600
+			msg.Msg = err.Error()
+			fmt.Println(err.Error())
+			reply(w, &msg)
+			err := dbConnect.Close(context.Background())
+			if err != nil {
+				return
+			}
+			return
+		}
+	} else {
+		sql := "update comment set likes=array_remove((select likes from comment where id=$1),$2) where id=$3"
+		dbConnect, err = pgx.Connect(context.Background(), dbString)
+		exec, err = dbConnect.Exec(context.Background(), sql, jsonMap["id"], jsonMap["account"], jsonMap["id"])
+		if err != nil {
+			msg.Status = -600
+			msg.Msg = err.Error()
+			fmt.Println(err.Error())
+			reply(w, &msg)
+			err := dbConnect.Close(context.Background())
+			if err != nil {
+				return
+			}
+			return
+		}
+	}
+
+	if exec.Update() {
+		fmt.Println("Update")
+		reply(w, &msg)
+	}
+
+}
+
+func CommentDislike(r *http.Request, w http.ResponseWriter) {
+	msg := replyProto{
+		Status: 0,
+		Msg:    "success",
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		msg.Msg = err.Error()
+		fmt.Println(err.Error())
+		reply(w, &msg)
+		return
+	}
+
+	jsonMap := make(map[string]interface{})
+	//将json字符串转换成map
+	err = json.Unmarshal(body, &jsonMap)
+	if err != nil {
+		msg.Msg = err.Error()
+		fmt.Println(err.Error())
+		reply(w, &msg)
+		return
+	}
+
+	// fmt.Println(jsonMap)
+
+	var exec pgconn.CommandTag
+	flag, _ := jsonMap["flag"]
+	if flag.(float64) == 1 {
+		sql := "update comment set stars=array_append((select stars from comment where id=$1),$2) where id=$3"
+		dbConnect, err = pgx.Connect(context.Background(), dbString)
+		exec, err = dbConnect.Exec(context.Background(), sql, jsonMap["id"], jsonMap["account"], jsonMap["id"])
+		if err != nil {
+			msg.Status = -600
+			msg.Msg = err.Error()
+			fmt.Println(err.Error())
+			reply(w, &msg)
+			err := dbConnect.Close(context.Background())
+			if err != nil {
+				return
+			}
+			return
+		}
+	} else {
+		sql := "update comment set stars=array_remove((select stars from comment where id=$1),$2) where id=$3"
+		dbConnect, err = pgx.Connect(context.Background(), dbString)
+		exec, err = dbConnect.Exec(context.Background(), sql, jsonMap["id"], jsonMap["account"], jsonMap["id"])
+		if err != nil {
+			msg.Status = -600
+			msg.Msg = err.Error()
+			fmt.Println(err.Error())
+			reply(w, &msg)
+			err := dbConnect.Close(context.Background())
+			if err != nil {
+				return
+			}
+			return
+		}
+	}
+
+	if exec.Update() {
+		reply(w, &msg)
+	}
+
+}
+
 
 //wangEditor指定返回json格式
 type Res struct {
@@ -413,9 +559,9 @@ func PostComment(r *http.Request, w http.ResponseWriter) {
 	//将json字符串转换成map
 	err = json.Unmarshal(body, &jsonMap)
 
-	sql := "insert into comment (comment_to, create_by, content, stars,likes,comments) values($1,$2,$3,$4,$5,$6)"
+	sql := "insert into comment (comment_to, create_by, content, stars,likes,comments) values($1,$2,$3,'{}','{}',$4)"
 	dbConnect, err = pgx.Connect(context.Background(), dbString)
-	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["comment_to"], jsonMap["create_by"], jsonMap["content"], jsonMap["stars"], jsonMap["likes"], jsonMap["comments"])
+	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["comment_to"], jsonMap["create_by"], jsonMap["content"],  jsonMap["comments"])
 	if err != nil {
 		msg.Status = -900
 		msg.Msg = err.Error()
@@ -473,7 +619,7 @@ func ReadComment(r *http.Request, w http.ResponseWriter) {
 		return
 	}
 	for result.Next() {
-		err := result.Scan(&comment.Id, &comment.CommentTo, &comment.CreateBy, &comment.Username, &comment.Avatar, &comment.Content, &comment.Stars, &comment.Likes, &comment.Comments, &comment.CreateAt)
+		err := result.Scan(&comment.Id, &comment.CommentTo, &comment.CreateBy, &comment.Username, &comment.Avatar, &comment.Content, &comment.StarsAry, &comment.LikesAry, &comment.Comments, &comment.CreateAt)
 		if err != nil {
 			fmt.Println(err.Error())
 			msg.Status = -800
@@ -483,6 +629,7 @@ func ReadComment(r *http.Request, w http.ResponseWriter) {
 			return
 		}
 		//fmt.Println(comment)
+		// fmt.Println(comment.StarsAry)
 		comment.Like = false
 		comment.Star = false
 		msg.Comments = append(msg.Comments, comment)
