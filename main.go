@@ -67,6 +67,8 @@ type Article struct {
 	Comments    int              `json:"comments"`
 	CreateAt    pgtype.Timestamp `json:"create_at"`
 	UpdateAt    pgtype.Timestamp `json:"update_at"`
+	CreateTime  string 			 `json:"create_time"`
+	UpdateTime  string 			 `json:"update_time"`
 }
 
 type Comment struct {
@@ -85,6 +87,7 @@ type Comment struct {
 	Oneself   int              `json:"oneself"`
 	StarsAry  pgtype.TextArray `json:"starsAry"`
 	LikesAry  pgtype.TextArray `json:"likesAry"`
+	CreateTime  string 			 `json:"create_time"`
 }
 
 type User struct {
@@ -143,6 +146,10 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		UploadImg(r, w)
 		break
 
+	case "/api/upload-video":
+		UploadVideo(r, w)
+		break
+
 	case "/api/comment/dislike":
 		CommentDislike(r, w)
 		break
@@ -170,6 +177,101 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	//}
 
 }
+
+type Video struct{
+	Url   string   `json:"url"`
+}
+//wangEditor指定返回json格式
+type VideoRes struct {
+	Errno int      `json:"errno"`
+	Data  Video    `json:"data"`
+}
+
+func UploadVideo(r *http.Request, w http.ResponseWriter) {
+	msg := replyProto{
+		Status: 0,
+		Msg:    "success",
+	}
+
+	err := r.ParseMultipartForm(1 << 20 * 20)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(r.MultipartForm.File)
+
+	label := strconv.FormatInt(time.Now().Unix(), 10)
+	var name string
+	var data Video
+	res := VideoRes{
+		Errno: 0,
+		Data:  data,
+	}
+
+	for key, value := range r.MultipartForm.File {
+		fmt.Println(key, value)
+		file, m, err := r.FormFile(key)
+		if err != nil {
+			return
+		}
+		// 保存图片
+		//err = os.Mkdir("./images/", 0777)
+		//if err != nil {
+		//	return
+		//}
+		name = m.Filename
+		saveFile, err := os.OpenFile("../../images/"+label+m.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		_, err = io.Copy(saveFile, file)
+		if err != nil {
+			msg.Msg = err.Error()
+			msg.Status = -1000
+			fmt.Println(err.Error())
+			return
+		}
+
+		defer func(file multipart.File) {
+			err := file.Close()
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+		}(file)
+		defer func(saveFile *os.File) {
+			err := saveFile.Close()
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+		}(saveFile)
+
+		url := "http://8.142.102.189:8083/" + label + name
+		fmt.Println(url)
+		// imgUrl=url
+
+		data.Url = url
+		res.Data = data
+
+	}
+
+	
+	//Marshal()将数据编码成json字符串
+	buf, err := json.Marshal(&res)
+	if err != nil {
+		_, err := w.Write([]byte(fmt.Sprintf(`{"code":-300,"msg":"%s"}`, err.Error())))
+		if err != nil {
+			return
+		}
+		fmt.Println(err.Error())
+		return
+	}
+
+	_, err = w.Write(buf)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+}
+
 
 func CommentLike(r *http.Request, w http.ResponseWriter) {
 	msg := replyProto{
@@ -664,7 +766,7 @@ func ReadArticles(w http.ResponseWriter) {
 	}
 
 	var article Article
-	sql := "select article.id,create_by,title,description,content,figure,stars,likes,comments,article.create_at,article.update_at,avatar from article,users where article.create_by=users.id"
+	sql := "select article.id,create_by,title,description,content,figure,stars,likes,comments,article.create_at,article.update_at,avatar from article,users where article.create_by=users.id order by update_at desc"
 
 	dbConnect, _ = pgx.Connect(context.Background(), dbString)
 
