@@ -1,16 +1,4 @@
 Listening
-map[video.mp4:[0xc00026fa90]]
-video.mp4 [0xc00026fa90]
-http://8.142.102.189:8083/1645704616video.mp4
-map[video.mp4:[0xc00006d180]]
-video.mp4 [0xc00006d180]
-http://8.142.102.189:8083/1645704782video.mp4
-map[file:[0xc00006ccd0]]
-file [0xc00006ccd0]
-http://8.142.102.189:8083/1645704795newplot.png
-insert:http://8.142.102.189:8083/1645704795newplot.png
-发布成功
-map[5.bmp:[0xc0000f0050]]
-5.bmp [0xc0000f0050]
-http://8.142.102.189:8083/16457056375.bmp
-signal: terminated
+ERROR: insert or update on table "comment" violates foreign key constraint "comment_create_by_fkey" (SQLSTATE 23503)
+评论成功
+Update
