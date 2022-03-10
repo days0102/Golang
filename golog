@@ -2,3 +2,62 @@ Listening
 ERROR: insert or update on table "comment" violates foreign key constraint "comment_create_by_fkey" (SQLSTATE 23503)
 评论成功
 Update
+Update
+Update
+删除成功
+评论成功
+map[character1b.bmp:[0xc00021c0f0]]
+character1b.bmp [0xc00021c0f0]
+http://8.142.102.189:8083/1645786649character1b.bmp
+map[character1b.bmp:[0xc00021c0f0]]
+character1b.bmp [0xc00021c0f0]
+http://8.142.102.189:8083/1645786860character1b.bmp
+map[video.mp4:[0xc00021c0f0]]
+video.mp4 [0xc00021c0f0]
+http://8.142.102.189:8083/1645787088video.mp4
+map[character1b.bmp:[0xc0001e80f0]]
+character1b.bmp [0xc0001e80f0]
+http://8.142.102.189:8083/1645787250character1b.bmp
+insert:http://8.142.102.189:8083/1645787250character1b.bmp
+发布成功
+map[video.mp4:[0xc00006d180]]
+video.mp4 [0xc00006d180]
+http://8.142.102.189:8083/1645835936video.mp4
+map[character1a24.bmp:[0xc00006ccd0]]
+character1a24.bmp [0xc00006ccd0]
+http://8.142.102.189:8083/1645835953character1a24.bmp
+map[file:[0xc00006d130]]
+file [0xc00006d130]
+http://8.142.102.189:8083/1645835977dota.bmp
+insert:http://8.142.102.189:8083/1645835977dota.bmp
+发布成功
+评论成功
+Update
+Update
+Update
+删除成功
+map[character1b.bmp:[0xc0001510e0]]
+character1b.bmp [0xc0001510e0]
+http://8.142.102.189:8083/1645838117character1b.bmp
+map[video.mp4:[0xc000151180]]
+video.mp4 [0xc000151180]
+http://8.142.102.189:8083/1645838145video.mp4
+map[dota.bmp:[0xc00017e280]]
+dota.bmp [0xc00017e280]
+http://8.142.102.189:8083/1645840828dota.bmp
+map[video.mp4:[0xc00017ed70]]
+video.mp4 [0xc00017ed70]
+http://8.142.102.189:8083/1645840845video.mp4
+map[video.mp4:[0xc00017ec30]]
+video.mp4 [0xc00017ec30]
+http://8.142.102.189:8083/1645840863video.mp4
+map[file:[0xc00017ed70]]
+file [0xc00017ed70]
+http://8.142.102.189:8083/1645840880dota.bmp
+insert:http://8.142.102.189:8083/1645840880dota.bmp
+发布成功
+评论成功
+Update
+Update
+删除成功
+ERROR: insert or update on table "comment" violates foreign key constraint "comment_create_by_fkey" (SQLSTATE 23503)
