@@ -1,0 +1,46 @@
+
+> vue-project@0.0.0 dev
+> vite
+
+
+  vite v2.7.13 dev server running at:
+
+  > Local:    http://localhost:8082/
+  > Network:  http://172.20.158.25:8082/
+
+  ready in 556ms.
+
+7:21:43 PM [vite] http proxy error:
+Error: socket hang up
+    at connResetException (node:internal/errors:691:14)
+    at Socket.socketOnEnd (node:_http_client:471:23)
+    at Socket.emit (node:events:402:35)
+    at endReadableNT (node:internal/streams/readable:1343:12)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21)
+7:28:51 PM [vite] hmr update /src/views/CreateArticleView.vue
+7:29:08 PM [vite] hmr update /src/views/CreateArticleView.vue
+7:30:09 PM [vite] hmr update /src/views/CreateArticleView.vue
+7:41:57 PM [vite] hmr update /src/views/CreateArticleView.vue
+7:42:59 PM [vite] hmr update /src/views/CreateArticleView.vue
+7:36:32 PM [vite] hmr update /src/views/ArticlesView.vue
+7:37:29 PM [vite] hmr update /src/views/ArticlesView.vue
+7:37:53 PM [vite] hmr update /src/views/ArticlesView.vue
+7:40:02 PM [vite] hmr update /src/views/ArticlesView.vue
+7:42:08 PM [vite] hmr update /src/views/ArticlesView.vue
+7:42:44 PM [vite] hmr update /src/views/ArticlesView.vue
+7:43:34 PM [vite] hmr update /src/views/ArticlesView.vue
+7:44:55 PM [vite] hmr update /src/views/ArticleDetail.vue
+7:45:19 PM [vite] hmr update /src/views/ArticleDetail.vue
+8:16:07 PM [vite] hmr update /src/views/ArticlesView.vue
+8:16:38 PM [vite] hmr update /src/views/ArticlesView.vue
+8:17:01 PM [vite] hmr update /src/views/ArticleDetail.vue
+8:17:16 PM [vite] hmr update /src/views/ArticleDetail.vue
+8:17:45 PM [vite] hmr update /src/views/ArticleDetail.vue
+8:18:43 PM [vite] hmr update /src/views/ArticleDetail.vue
+8:19:30 PM [vite] hmr update /src/views/ArticleDetail.vue
+8:20:01 PM [vite] hmr update /src/views/ArticleDetail.vue
+10:53:49 AM [vite] hmr update /src/views/ArticleDetail.vue
+10:57:36 AM [vite] hmr update /src/views/ArticleDetail.vue
+11:01:03 AM [vite] hmr update /src/views/ArticlesView.vue
+11:01:32 AM [vite] hmr update /src/views/ArticlesView.vue
+11:02:05 AM [vite] hmr update /src/views/ArticlesView.vue
