@@ -19,7 +19,7 @@ import (
 )
 
 var dbConnect *pgx.Conn
-var imgUrl string="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+var imgUrl string = "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
 
 //const path = "^/(?P<one>\\w+)/(?P<two>\\w+)"
 
@@ -62,32 +62,32 @@ type Article struct {
 	Content     string           `json:"content"`
 	Stars       int              `json:"stars"`
 	Likes       int              `json:"likes"`
-	Like  		bool 			 `json:"like"`
+	Like        bool             `json:"like"`
 	Star        bool             `json:"star"`
 	Comments    int              `json:"comments"`
 	CreateAt    pgtype.Timestamp `json:"create_at"`
 	UpdateAt    pgtype.Timestamp `json:"update_at"`
-	CreateTime  string 			 `json:"create_time"`
-	UpdateTime  string 			 `json:"update_time"`
+	CreateTime  string           `json:"create_time"`
+	UpdateTime  string           `json:"update_time"`
 }
 
 type Comment struct {
-	Id        int              `json:"id"`
-	CommentTo int              `json:"comment_to"`
-	CreateBy  string           `json:"create_by"`
-	Username  string           `json:"username"`
-	Avatar    string           `json:"avatar"`
-	Content   string           `json:"content"`
-	Stars     int              `json:"stars"`
-	Likes     int              `json:"likes"`
-	Like      bool             `json:"like"`
-	Star      bool             `json:"star"`
-	Comments  int              `json:"comments"`
-	CreateAt  pgtype.Timestamp `json:"create_at"`
-	Oneself   int              `json:"oneself"`
-	StarsAry  pgtype.TextArray `json:"starsAry"`
-	LikesAry  pgtype.TextArray `json:"likesAry"`
-	CreateTime  string 			 `json:"create_time"`
+	Id         int              `json:"id"`
+	CommentTo  int              `json:"comment_to"`
+	CreateBy   string           `json:"create_by"`
+	Username   string           `json:"username"`
+	Avatar     string           `json:"avatar"`
+	Content    string           `json:"content"`
+	Stars      int              `json:"stars"`
+	Likes      int              `json:"likes"`
+	Like       bool             `json:"like"`
+	Star       bool             `json:"star"`
+	Comments   int              `json:"comments"`
+	CreateAt   pgtype.Timestamp `json:"create_at"`
+	Oneself    int              `json:"oneself"`
+	StarsAry   pgtype.TextArray `json:"starsAry"`
+	LikesAry   pgtype.TextArray `json:"likesAry"`
+	CreateTime string           `json:"create_time"`
 }
 
 type User struct {
@@ -178,13 +178,14 @@ func serve(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type Video struct{
-	Url   string   `json:"url"`
+type Video struct {
+	Url string `json:"url"`
 }
+
 //wangEditor指定返回json格式
 type VideoRes struct {
-	Errno int      `json:"errno"`
-	Data  Video    `json:"data"`
+	Errno int   `json:"errno"`
+	Data  Video `json:"data"`
 }
 
 func UploadVideo(r *http.Request, w http.ResponseWriter) {
@@ -253,7 +254,6 @@ func UploadVideo(r *http.Request, w http.ResponseWriter) {
 
 	}
 
-	
 	//Marshal()将数据编码成json字符串
 	buf, err := json.Marshal(&res)
 	if err != nil {
@@ -271,7 +271,6 @@ func UploadVideo(r *http.Request, w http.ResponseWriter) {
 	}
 
 }
-
 
 func CommentLike(r *http.Request, w http.ResponseWriter) {
 	msg := replyProto{
@@ -406,7 +405,6 @@ func CommentDislike(r *http.Request, w http.ResponseWriter) {
 
 }
 
-
 //wangEditor指定返回json格式
 type Res struct {
 	Errno int      `json:"errno"`
@@ -472,14 +470,13 @@ func UploadImg(r *http.Request, w http.ResponseWriter) {
 
 		url := "http://8.142.102.189:8083/" + label + name
 		fmt.Println(url)
-		imgUrl=url
+		imgUrl = url
 
 		data = append(data, url)
 		res.Data = data
 
 	}
 
-	
 	//Marshal()将数据编码成json字符串
 	buf, err := json.Marshal(&res)
 	if err != nil {
@@ -521,10 +518,10 @@ func CreateArticle(r *http.Request, w http.ResponseWriter) {
 	sql := "insert into article(create_by,title,description,content,figure,stars,likes,comments) values($1,$2,$3,$4,$5,0,0,0)"
 
 	dbConnect, err = pgx.Connect(context.Background(), dbString)
-	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["create_by"], jsonMap["title"], jsonMap["description"], jsonMap["content"],imgUrl)
-	fmt.Println("insert:"+imgUrl)
-	imgUrl="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-	
+	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["create_by"], jsonMap["title"], jsonMap["description"], jsonMap["content"], imgUrl)
+	fmt.Println("insert:" + imgUrl)
+	imgUrl = "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+
 	if err != nil {
 		msg.Status = -600
 		msg.Msg = err.Error()
@@ -663,7 +660,7 @@ func PostComment(r *http.Request, w http.ResponseWriter) {
 
 	sql := "insert into comment (comment_to, create_by, content, stars,likes,comments) values($1,$2,$3,'{}','{}',$4)"
 	dbConnect, err = pgx.Connect(context.Background(), dbString)
-	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["comment_to"], jsonMap["create_by"], jsonMap["content"],  jsonMap["comments"])
+	exec, err := dbConnect.Exec(context.Background(), sql, jsonMap["comment_to"], jsonMap["create_by"], jsonMap["content"], jsonMap["comments"])
 	if err != nil {
 		msg.Status = -900
 		msg.Msg = err.Error()
@@ -798,8 +795,8 @@ func ReadArticles(w http.ResponseWriter) {
 		}
 
 		//fmt.Println(article)
-		article.Like=false
-		article.Star=false
+		article.Like = false
+		article.Star = false
 		msg.Articles = append(msg.Articles, article)
 	}
 	reply(w, &msg)
@@ -948,7 +945,7 @@ func login(r *http.Request, w http.ResponseWriter) {
 	}
 }
 
-const dbString = "postgres://test:test@8.142.102.189:5432/test"
+const dbString = "postgres://test:test@localhost:5432/test"
 
 func main() {
 
