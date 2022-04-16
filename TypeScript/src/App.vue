@@ -107,7 +107,7 @@
     <div class="right-page">
       <div class="head" style="border-radius: 5px;margin-right: 5px;margin-top: 5px">
         <div style="float: left;padding-left: 8px">
-          <h1 class="title" style="color: whitesmoke; font-size: xx-large;letter-spacing: 3px;font-weight: bold">欧美学生会</h1>
+          <h1 class="title" style="color: whitesmoke; font-size: xx-large;letter-spacing: 3px;font-weight: bold">一二三四五</h1>
         </div>
         <div v-if="loginFlag" style="float: right;margin-right: 10px">
           <a-avatar :size="40" :src="avatar">
